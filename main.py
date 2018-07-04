@@ -5,10 +5,20 @@
 # @File    : main.py
 # @Software: PyCharm
 
+from argparse import ArgumentParser
+
 from utils.test import Data
+from utils.json_loader import config_load
+from agent.agent import Agent
+
+def build_parser():
+    parser = ArgumentParser()
+    parser.add_argument("--processes")
 
 def main():
-    raw_data = Data('data/BX-CSV-Dump/test.csv')
+    config = config_load('config.json')
+    agent = Agent(config)
+
 
 
 if __name__ == '__main__':

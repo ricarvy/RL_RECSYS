@@ -1,0 +1,63 @@
+{
+  "normal_args":{
+    "state_dim":10,
+    "action_dim":3,
+    "discount_factor":0.75,
+    "max_iter":5000
+  },
+  "replay_buffer":{
+    "buffer_size":10000,
+    "batch_size":128
+  },
+  "ou": {
+    "theta": 0.15,
+    "mu":0,
+    "sigma":0.2
+  },
+  "network": {
+    "actor": {
+      "learning_rate":1e-4,
+      "reg_rate":0.01,
+      "layers":
+      [
+        {
+          "name":"hidden_1",
+          "dim":400,
+          "activation":"relu",
+          "reg":"l2"
+        },
+        {
+          "name":"hidden_2",
+          "dim":300,
+          "activation":"relu",
+          "reg":"l2"
+        }
+      ]
+    },
+    "critic":{
+      "learning_rate":1e-3,
+      "reg_rate":0.01,
+      "layers":
+      [
+        {
+          "name":"hidden_1",
+          "dim":400,
+          "activation":"relu",
+          "reg":"l2"
+        },
+        {
+          "name":"hidden_2",
+          "dim":100,
+          "activation":"relu",
+          "reg":"l2"
+        },
+        {
+          "name":"hidden_3",
+          "dim":300,
+          "activation":"relu",
+          "reg":"l2"
+        }
+      ]
+    }
+  }
+}
