@@ -12,22 +12,20 @@ sys.path.append(lib_path)
 import tensorflow as tf
 from network.actor import DDPG_Actor
 from network.critic import DDPG_Critic
+from utils.json_loader import config_load
 
 
 class Model(object):
     def __init__(self,
-                 state_dim,
-                 action_dim,
+                 config,
                  optimizer=None,
-                 actor_learning_rate=1e-4,
-                 critic_learning_rate=1e-3,
-                 tau = 0.001,
                  sess=None):
-        self.state_dim = state_dim
-        self.action_dim = action_dim
-        self.actor_learning_rate = actor_learning_rate
-        self.critic_learning_rate = critic_learning_rate
-        self.tau = tau
+        self.state_dim = config["normal_args"]["state_dim"]
+        self.action_dim = config["normal_args"]["action_dim"]
+        self.actor_learning_rate = config["network"]["actor"]["learning_rate"]
+        self.critic_learning_rate = config["network"]["critic"]["learning_rate"]
+        self.tau = config["normal_args"]["tau"]
+
 
         #tf.reset_default_graph()
         self.sess = sess or tf.Session()
@@ -55,13 +53,22 @@ class Model(object):
                         sess=self.sess)
 
     def update(self, state_batch, action_batch, y_batch, sess=None):
+
         sess = sess or self.sess
+
+        ### update source critic net
         self.critic.update_source_critic_net(state_batch, action_batch, y_batch, sess)
+
         action_batch_for_grad = self.actor.predict_action_source_net(state_batch, sess)
         action_grad_batch = self.critic.get_action_grads(state_batch, action_batch_for_grad, sess)
+
+        ### update source actor net
         self.actor.update_source_actor_net(state_batch, action_grad_batch, sess)
 
+        ### update target critic net
         self.critic.update_target_critic_net(sess)
+
+        ### update target actor net
         self.actor.update_target_actor_net(sess)
 
     def predict_action(self, observation, sess=None):
@@ -70,7 +77,7 @@ class Model(object):
 
 if __name__ == '__main__':
     import numpy as np
-    state_dim = 40
+    state_dim = 10
     action_dim = 3
     actor_learning_rate = np.random.rand(1)
     print("actor_learning_rate: ", actor_learning_rate)
@@ -78,12 +85,9 @@ if __name__ == '__main__':
     print("critic_learning_rate: ", critic_learning_rate)
     tau = np.random.rand(1)
     print("tau: ", tau)
+    config = config_load("../config.json")
     sess = tf.Session()
-    model = Model(state_dim,
-                  action_dim,
-                  tau=tau,
-                  actor_learning_rate=actor_learning_rate[0],
-                  critic_learning_rate=critic_learning_rate[0],
+    model = Model(config,
                   sess=sess)
     random_state = np.random.normal(size=state_dim)
     print("random_state", random_state)
@@ -100,4 +104,8 @@ if __name__ == '__main__':
     print("predict target q", target_q)
     y = target_q[0] + 1
 
+    weight_target_critic = model.critic.run_layer_weight_target(sess)
     model.update([random_state], [random_action], [y])
+    weight_target_critic_updated = model.critic.run_layer_weight_target(sess)
+    gap_weight = np.array(weight_target_critic) - np.array(weight_target_critic_updated)
+    print(gap_weight)

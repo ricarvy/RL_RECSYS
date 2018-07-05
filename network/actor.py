@@ -27,6 +27,7 @@ class DDPG_Actor(object):
         self.kernel_initializer_1 = tf.random_uniform_initializer(minval=-1/sqrt(self.h1_dim), maxval=1/sqrt(self.h1_dim))
         self.kernel_initializer_2 = tf.random_uniform_initializer(minval=-1/sqrt(self.h2_dim), maxval=1/sqrt(self.h2_dim))
         self.kernel_initializer_3 = tf.random_uniform_initializer(minval=-3e-3, maxval=3e-3)
+        self.bias_initializer = tf.random_uniform_initializer(3e-3, 3e-3)
         self.kernel_regularizer = tf.contrib.layers.l2_regularizer(self.l2_reg)
 
         with tf.name_scope("actor_input"):
@@ -61,7 +62,7 @@ class DDPG_Actor(object):
                                 units=self.h1_dim,
                                 activation=self.activation,
                                 kernel_initializer=self.kernel_initializer_1,
-                                # kernel_initializer=self.kernel_initializer,
+                                bias_initializer=self.bias_initializer,
                                 kernel_regularizer=self.kernel_regularizer,
                                 name="hidden_1")
 
@@ -69,7 +70,7 @@ class DDPG_Actor(object):
                                 units=self.h2_dim,
                                 activation=self.activation,
                                 kernel_initializer=self.kernel_initializer_2,
-                                # kernel_initializer=self.kernel_initializer,
+                                bias_initializer=self.bias_initializer,
                                 kernel_regularizer=self.kernel_regularizer,
                                 name="hidden_2")
 
@@ -85,6 +86,7 @@ class DDPG_Actor(object):
                                 activation=tf.nn.tanh,
                                 # activation=tf.nn.tanh,
                                 kernel_initializer=self.kernel_initializer_3,
+                                bias_initializer=self.bias_initializer,
                                 # kernel_initializer=self.kernel_initializer,
                                 kernel_regularizer=self.kernel_regularizer,
                                 use_bias=False,

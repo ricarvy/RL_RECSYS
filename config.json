@@ -3,7 +3,8 @@
     "state_dim":10,
     "action_dim":3,
     "discount_factor":0.75,
-    "max_iter":5000
+    "max_iter":5000,
+    "tau":0.001
   },
   "replay_buffer":{
     "buffer_size":10000,
