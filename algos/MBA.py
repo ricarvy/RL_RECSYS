@@ -108,6 +108,7 @@ class UCBBandit(Bandit):
             np.minimum(variance +
                        np.sqrt(2 * np.log(t) / self.beta_params[:,2]), 0.25) *
                         np.log(t) / self.beta_params[:,2])
+        print(len(UCB))
         return np.argmax(UCB)
 
     def get_name(self):
@@ -129,17 +130,35 @@ class EpsilonGreedyBandit(Bandit):
         return np.argmax(self.beta_params[:, 1] / self.beta_params[:, 2])
 
     def choose_random_arm(self):
-        return random.randint(0,self.K)
+        return random.randint(0,self.K-1)
+
+class BanditGenerator:
+    def __init__(self, name, K):
+        self.name = name
+        self.K = K
+
+    def bandit_gen(self):
+        if self.name == "naive":
+            return NaiveBandit(self.K)
+        elif self.name == "thompson":
+            return ThompsonSamplingBandit(self.K)
+        elif self.name == "ucb":
+            return UCBBandit(self.K)
+        elif self.name == "epsilon":
+            return EpsilonGreedyBandit(self.K)
+        else:
+            raise BaseException("Illegal bandit type!")
 
 
 
 
 if __name__ == '__main__':
-    bandit = ThompsonSamplingBandit(K = 3)
+    K = 3
+    bandit = BanditGenerator('naive',K).bandit_gen()
     bandit.update_arm(choosen_arm=1, result=1)
     bandit.update_arm(choosen_arm=2, result=1)
     bandit.update_arm(choosen_arm=0, result=1)
-    arm_set = np.zeros((1,3))
+    arm_set = np.zeros((1,K))
     for i in range(100):
         arm = bandit.choose_arm()
         print("The choosen arm is {}".format(arm))
