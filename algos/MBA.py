@@ -16,6 +16,8 @@ Naive-bandit, Thompson-sampling-bandit, UCB-bandit, Epsilon-greedy-bandit
 
 import numpy as np
 import random
+import math
+import time
 
 class Bandit:
     def __init__(self, K):
@@ -63,7 +65,35 @@ class ThompsonSamplingBandit(Bandit):
         self.name = "ThompsonSamplingBandit"
 
     def choose_arm(self):
-        pass
+        arms_sampling = list()
+        for i in range(self.K):
+            record = self.beta_params[i]
+            successes = record[1]
+            totals = record[2]
+            arms_sampling.append(
+                self.thompson_sampling(1 + successes, 1 + totals - successes))
+        return np.argmax(np.array(arms_sampling))
+
+    def thompson_sampling(self, a, b):
+        alpha = a+b
+        beta = 0.0
+        u1, u2, w, v = 0.0, 0.0, 0.0, 0.0
+        constant = 1 + random.random()
+        if min(a, b) <= 1.0:
+            beta = max(1/a, 1/b)
+        else:
+            beta = math.sqrt(alpha - 2.0) / (2 * a * b - alpha)
+        gamma = a + 1 / beta
+        while(True):
+            u1 = random.random()
+            u2 = random.random()
+            v = beta * math.log(u1 / (1 - u1))
+            w = a * math.exp(v)
+            tmp = math.log(alpha / (b + w))
+            if (alpha * tmp + (gamma * v) - constant >= math.log((u1 ** 2 * u2))):
+                break
+        x = w / (b + w)
+        return x
 
 class UCBBandit(Bandit):
     def __init__(self, K):
@@ -105,9 +135,16 @@ class EpsilonGreedyBandit(Bandit):
 
 
 if __name__ == '__main__':
-    bandit = EpsilonGreedyBandit(K = 3)
+    bandit = ThompsonSamplingBandit(K = 3)
     bandit.update_arm(choosen_arm=1, result=1)
     bandit.update_arm(choosen_arm=2, result=1)
-    bandit.update_arm(choosen_arm=1, result=1)
-    # print(bandit.get_beta_params())
-    print(bandit.choose_arm())
+    bandit.update_arm(choosen_arm=0, result=1)
+    arm_set = np.zeros((1,3))
+    for i in range(100):
+        arm = bandit.choose_arm()
+        print("The choosen arm is {}".format(arm))
+        bandit.update_arm(choosen_arm=arm, result=1 if random.random()>0.5 else 0)
+        # print(bandit.beta_params)
+        arm_set[:,arm] += 1
+    print(arm_set)
+
