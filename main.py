@@ -40,7 +40,7 @@ def create_df(path, name):
 
     n_t = datetime.now()
     logging.info(f"Time consuming is {(o_t-n_t).microseconds} ms")
-    logging.info("{name} creation is ended : ..............................")
+    logging.info(f"{name} creation is ended : ..............................")
 
     return df
 
@@ -52,12 +52,14 @@ def create_agent(config, session):
     ou_process = OU_Process(config)
     record = create_df("data/temp/user_15330397.csv", "record")
     item_set = create_df("data/fresh_comp_offline/tianchi_fresh_comp_train_item.csv", "item_set")
-    agent = Agent(config=config,
+    user_item_data = create_df("data/fresh_comp_offline/tianchi_fresh_comp_train_user.csv", "user_set")
+    agent = Agent(config=config ,
                   model=model,
                   replay_buffer=replay_buffer,
                   noise=ou_process,
                   record=record,
                   item_set=item_set,
+                  user_item_data = user_item_data,
                   verbose=1)
     logging.info("End creating agent : ====================================================================")
     return agent
@@ -74,7 +76,7 @@ def main():
         print("train")
     if option.process == "create_agent":
         agent = create_agent(config=config, session=session)
-        for i in range(1000):
+        for i in range(10):
             print(f"Num {i} epoch : ")
             print(agent.get_reward_from_actions())
 
