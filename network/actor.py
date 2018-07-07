@@ -114,7 +114,7 @@ class DDPG_Actor(object):
         self.grads_and_vars = zip(self.policy_gradient, source_vars)
 
     def __create_train_op(self):
-        self.train_policy_op = self.optimizer.apply_gradients(self.grads_and_vars, global_step=tf.contrib.framework.get_global_step())
+        self.train_policy_op = self.optimizer.apply_gradients(self.grads_and_vars, global_step=tf.train.get_global_step())
         train_op_vars = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope= self.scope + "/" + self.train_op_scope) # to do: remove prefix
         train_op_vars.extend(tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope=self.train_op_scope))
         self.sess.run(tf.variables_initializer(train_op_vars))

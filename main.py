@@ -8,45 +8,78 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import tensorflow as tf
+import logging
 
 from argparse import ArgumentParser
+from datetime import datetime
 
 from utils.test import Data
 from utils.json_loader import config_load
 from agent.agent import Agent
+from buffer.replay_buffer import Replay_Buffer
+from process.ou_noise_process import OU_Process
+from network.net import Model
 
 def build_parser():
     parser = ArgumentParser()
-    parser.add_argument("--processes")
+    parser.add_argument("--mode",
+                        dest="mode",
+                        help="")
+    parser.add_argument("--process",
+                        dest="process",
+                        help="")
+    return parser
+
+def create_df(path, name):
+    logging.info(f"create {name} of agent : ..............................")
+    o_t = datetime.now()
+
+    df = pd.read_csv(path)
+    logging.info(f"the shape of df is {df.shape}")
+
+    n_t = datetime.now()
+    logging.info(f"Time consuming is {(o_t-n_t).microseconds} ms")
+    logging.info("{name} creation is ended : ..............................")
+
+    return df
+
+def create_agent(config, session):
+    logging.info("Create agent : ====================================================================")
+    model = Model(config=config,
+                  sess=session)
+    replay_buffer = Replay_Buffer(config)
+    ou_process = OU_Process(config)
+    record = create_df("data/temp/user_15330397.csv", "record")
+    item_set = create_df("data/fresh_comp_offline/tianchi_fresh_comp_train_item.csv", "item_set")
+    agent = Agent(config=config,
+                  model=model,
+                  replay_buffer=replay_buffer,
+                  noise=ou_process,
+                  record=record,
+                  item_set=item_set,
+                  verbose=1)
+    logging.info("End creating agent : ====================================================================")
+    return agent
 
 def main():
-    # config = config_load('config.json')
-    # agent = Agent(config)
-    # df = pd.read_csv("data/fresh_comp_offline/tianchi_fresh_comp_train_user.csv")
-    # df = df[df['user_id'] == 15330397]
-    # df.to_csv("data/temp/user_15330397.csv")
-    # df_group_by_item_category = df.groupby(by=["item_category"])['user_id'].count()
+    logging.basicConfig(level=logging.DEBUG)
+    agent = None
+    session = tf.Session()
+    parser = build_parser()
+    option = parser.parse_args()
+    config = config_load("config.json")
 
-    df_user = pd.read_csv("data/temp/user_15330397.csv")
-    item_category_user = df_user["item_category"].values
-    # # print(df[df['item_id'] == 2538])
-    # df_group_by_item_cat = df.groupby(by=["item_category"])["user_id"].count().sort_values(ascending=False)
-    # print(df_group_by_item_cat)
-    # print(df[df["item_id"] == 54031954])
-    # print(df_group_by_item_id)
-    # plot_index = df_group_by_item_id.index
-    # plot_value = df_group_by_item_id.values
-    # print(plot_index[np.argmax(plot_value)])  # 54031952
+    if option.mode == "train":
+        print("train")
+    if option.process == "create_agent":
+        agent = create_agent(config=config, session=session)
+        for i in range(1000):
+            print(f"Num {i} epoch : ")
+            print(agent.get_reward_from_actions())
 
-    # df = pd.read_csv("data/fresh_comp_offline/tianchi_fresh_comp_train_item.csv")
-    # print(df[df["item_category"] == 54031952])
 
-    # plt.bar(range(len(plot_value)),plot_value,tick_label = plot_index)
-    # plt.show()
 
-    df_item =pd.read_csv("data/fresh_comp_offline/tianchi_fresh_comp_train_item.csv")
-    item_category_item = df_item["item_category"].values
-    print(np.intersect1d(item_category_user,item_category_item))
 
 if __name__ == '__main__':
     main()

@@ -1,7 +1,7 @@
 {
   "normal_args":{
     "state_dim":10,
-    "action_dim":3,
+    "action_dim":8,
     "discount_factor":0.75,
     "max_iter":5000,
     "tau":0.001
