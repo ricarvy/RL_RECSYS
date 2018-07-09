@@ -76,10 +76,20 @@ def main():
         print("train")
     if option.process == "create_agent":
         agent = create_agent(config=config, session=session)
-        for i in range(10):
-            print(f"Num {i} epoch : ")
-            print(agent.get_reward_from_actions())
-
+        # for i in range(10):
+        #     print(f"Num {i} epoch : ")
+        #     print(agent.get_reward_from_actions())
+        print(f"total item_set is {agent.get_item_set().shape[0]}")
+        reward_count = 0
+        for epoch in range(1000):
+            reward = agent.get_reward_from_actions()
+            print(f"Now is num {epoch} epoch: "
+                    f"current_state is {agent.get_cur_state()['item_id'].tolist()}, "
+                    f"curretn_action is {agent.get_cur_action()['item_id'].tolist()},"
+                    f"current reward is {reward}")
+            print(f"Now's length of item_set is {agent.get_item_set().shape[0]}")
+            reward_count += reward
+        print(reward_count)
 
 
 
