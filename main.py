@@ -66,7 +66,6 @@ def create_agent(config, session):
 
 def main():
     logging.basicConfig(level=logging.DEBUG)
-    agent = None
     session = tf.Session()
     parser = build_parser()
     option = parser.parse_args()
@@ -76,9 +75,6 @@ def main():
         print("train")
     if option.process == "create_agent":
         agent = create_agent(config=config, session=session)
-        # for i in range(10):
-        #     print(f"Num {i} epoch : ")
-        #     print(agent.get_reward_from_actions())
         print(f"total item_set is {agent.get_item_set().shape[0]}")
         reward_count = 0
         for epoch in range(1000):

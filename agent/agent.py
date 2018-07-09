@@ -79,7 +79,7 @@ class Agent():
 
     def get_reward_from_actions(self, discount_factor = 0.01):
         self.choose_action_random()
-        reward = 0 
+        reward = 0
         for action in self.cur_action.values:
             if action[0] in self.cur_state["item_id"].tolist():
                 reward += np.sum(self.record[self.record["item_id"] == action[0]]["behavior_type"])
