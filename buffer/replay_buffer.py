@@ -6,7 +6,6 @@
 # @Software: PyCharm
 
 import logging
-
 from datetime import datetime
 from collections import deque
 import random
@@ -27,7 +26,6 @@ class Replay_Buffer(object):
         logging.info(f"Time consuming is {(n_t - o_t).microseconds}")
 
         logging.info("replay buffer creation ended ..............................")
-
 
     def __call__(self):
         return self.memory

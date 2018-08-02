@@ -43,13 +43,13 @@ class OU_Process(object):
         self.update_process()
         return self.current_x
 
-# if __name__ == "__main__":
-#     ou = OU_Process(3, theta=0.15, mu=0, sigma=0.2)
-#     states = []
-#     for i in range(10000):
-#         states.append(ou.return_noise()[0])
-#     import matplotlib.pyplot as plt
-#
-#     plt.plot(states)
-#     plt.show()
+if __name__ == "__main__":
+    ou = OU_Process(3, theta=0.15, mu=0, sigma=0.2)
+    states = []
+    for i in range(10000):
+        states.append(ou.return_noise()[0])
+    import matplotlib.pyplot as plt
+
+    plt.plot(states)
+    plt.show()
 

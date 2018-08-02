@@ -9,6 +9,7 @@ import os, sys
 lib_path = os.path.abspath(os.path.dirname(__file__))
 sys.path.append(lib_path)
 
+
 import tensorflow as tf
 import logging
 
@@ -96,37 +97,37 @@ class Model(object):
         sess = sess or self.sess
         return self.actor.predict_action_source_net(observation, sess)
 
-# if __name__ == '__main__':
-#     import numpy as np
-#     state_dim = 10
-#     action_dim = 3
-#     actor_learning_rate = np.random.rand(1)
-#     print("actor_learning_rate: ", actor_learning_rate)
-#     critic_learning_rate = np.random.rand(1)
-#     print("critic_learning_rate: ", critic_learning_rate)
-#     tau = np.random.rand(1)
-#     print("tau: ", tau)
-#     config = config_load("../config.json")
-#     sess = tf.Session()
-#     model = Model(config,
-#                   sess=sess)
-#     random_state = np.random.normal(size=state_dim)
-#     print("random_state", random_state)
-#
-#     random_action = np.random.random(size=action_dim)
-#     print("random_action", random_action)
-#
-#     # check prediction
-#     pred_action = model.predict_action([random_state])
-#     print("predict_action", pred_action)
-#
-#     # check forward
-#     target_q = model.critic.predict_q_target_net([random_state], [random_action], sess)
-#     print("predict target q", target_q)
-#     y = target_q[0] + 1
-#
-#     weight_target_critic = model.critic.run_layer_weight_target(sess)
-#     model.update([random_state], [random_action], [y])
-#     weight_target_critic_updated = model.critic.run_layer_weight_target(sess)
-#     gap_weight = np.array(weight_target_critic) - np.array(weight_target_critic_updated)
-#     print(gap_weight)
+if __name__ == '__main__':
+    import numpy as np
+    state_dim = 10
+    action_dim = 3
+    actor_learning_rate = np.random.rand(1)
+    print("actor_learning_rate: ", actor_learning_rate)
+    critic_learning_rate = np.random.rand(1)
+    print("critic_learning_rate: ", critic_learning_rate)
+    tau = np.random.rand(1)
+    print("tau: ", tau)
+    config = config_load("../config.json")
+    sess = tf.Session()
+    model = Model(config,
+                  sess=sess)
+    random_state = np.random.normal(size=state_dim)
+    print("random_state", random_state)
+
+    random_action = np.random.random(size=action_dim)
+    print("random_action", random_action)
+
+    # check prediction
+    pred_action = model.predict_action([random_state])
+    print("predict_action", pred_action)
+
+    # check forward
+    target_q = model.critic.predict_q_target_net([random_state], [random_action], sess)
+    print("predict target q", target_q)
+    y = target_q[0] + 1
+
+    weight_target_critic = model.critic.run_layer_weight_target(sess)
+    model.update([random_state], [random_action], [y])
+    weight_target_critic_updated = model.critic.run_layer_weight_target(sess)
+    gap_weight = np.array(weight_target_critic) - np.array(weight_target_critic_updated)
+    print(gap_weight)
